@@ -108,8 +108,8 @@ pipeline {
         stage('Publish and Shutdown Zap'){
             steps {
                 sh "sleep 300"
-                sh "curl -v -o reports/zap-passive-report.html http://localhost:8080/OTHER/core/other/htmlreport"
-                sh "curl -v http://localhost:8080/OTHER/action/shutdown"
+                sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
+                //sh "curl http://localhost:8080/OTHER/action/shutdown"
                 publishHTML(target: [
                     reportDir             : 'reports',
                     reportFiles           : 'zap-passive-report.html',
