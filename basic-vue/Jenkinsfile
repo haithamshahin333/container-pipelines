@@ -79,10 +79,20 @@ pipeline {
                 verifyDeployment(targetApp: "${APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
+        stage('Start Owasp Zap') {
+            steps {
+                sh "nohup /usr/share/owasp-zap/zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.regex=true -config api.addrs.addr.name=.* &"
+
+                script {
+                    retry(10) {
+                        sleep 5
+                        sh 'curl -s http://localhost:8080/JSON/core/view/mode'
+                    }
+                }
+            }
+        }
         stage('E2E Testing') {
             steps {
-                //start owasp zap so that e2e tests can be proxied through zap
-                sh "nohup /usr/share/owasp-zap/zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.regex=true -config api.addrs.addr.name=.* &"
                 //get route from dev namespace
                 script {
                     openshift.withCluster() {
