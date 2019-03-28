@@ -105,17 +105,19 @@ pipeline {
                 }
             }
         }
-        stage('Publish and Shutdown Zap'){
-            steps {
-                sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
-                publishHTML(target: [
-                    reportDir             : 'reports',
-                    reportFiles           : 'zap-passive-report.html',
-                    reportName            : 'ZAProxy Passive Report',
-                    keepAll               : true,
-                    alwaysLinkToLastBuild : true,
-                    allowMissing          : true
-                ])
+        post{
+            success {
+                steps {
+                        sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
+                        publishHTML(target: [
+                            reportDir             : 'reports',
+                            reportFiles           : 'zap-passive-report.html',
+                            reportName            : 'ZAProxy Passive Report',
+                            keepAll               : true,
+                            alwaysLinkToLastBuild : true,
+                            allowMissing          : true
+                        ])
+                }
             }
         }
         stage('Promotion gate') {
