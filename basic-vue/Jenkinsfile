@@ -105,6 +105,20 @@ pipeline {
                 }
             }
         }
+        stage('Publish and Shutdown Zap'){
+            steps {
+                sh "curl -v -o reports/zap-passive-report.html http://localhost:8080/OTHER/core/other/htmlreport"
+                sh "curl -v http://localhost:8080/OTHER/action/shutdown"
+                publishHTML(target: [
+                    reportDir             : 'reports',
+                    reportFiles           : 'zap-passive-report.html',
+                    reportName            : 'ZAProxy Passive Report',
+                    keepAll               : true,
+                    alwaysLinkToLastBuild : true,
+                    allowMissing          : true
+                ])
+            }
+        }
         stage('Promotion gate') {
             steps {
                 script {
