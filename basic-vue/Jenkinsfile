@@ -103,14 +103,10 @@ pipeline {
                                 echo "${DEV_PROJECT}"
                                 def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
                                 openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
-
-                                retry(10) {
-                                    sleep 5
-                                    sh "curl -s http://${ZAP_APP_NAME}:8080/JSON/core/view/mode"
-                                }
                             }   
                         }
                     }
+                verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${DEV_PROJECT}")
                 }
 
         }
