@@ -83,30 +83,17 @@ pipeline {
                 verifyDeployment(targetApp: "${APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
-        // stage('Start Owasp Zap') {
-        //     steps {
-        //         sh "nohup /usr/share/owasp-zap/zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.regex=true -config api.addrs.addr.name=.* &"
-
-        //         script {
-        //             retry(10) {
-        //                 sleep 5
-        //                 sh 'curl -s http://localhost:8080/JSON/core/view/mode'
-        //             }
-        //         }
-        //     }
-        // }
         stage('Start Zap') {
             steps {
                 script {
-                        openshift.withCluster() {
-                            openshift.withProject("${CI_CD_PROJECT}") {
-                                def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
-                                openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
-                            }   
-                        }
+                    openshift.withCluster() {
+                        openshift.withProject("${CI_CD_PROJECT}") {
+                            def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
+                            openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
+                        }   
                     }
                 }
-
+            }
         }
         stage('Verify Zap Deployment') {
             steps {
@@ -119,6 +106,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${DEV_PROJECT}") {
+                            sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' "
                             def route = openshift.selector("route/${APP_NAME}").object()
                             echo "${route.spec.host}"
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
