@@ -100,7 +100,7 @@ pipeline {
                 script {
                         openshift.withCluster() {
                             openshift.withProject("${DEV_PROJECT}") {
-                                echo "here in zap"
+                                echo "${DEV_PROJECT}"
                                 def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
                                 openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
                             }   
