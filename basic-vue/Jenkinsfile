@@ -108,7 +108,6 @@ pipeline {
                         openshift.withProject("${DEV_PROJECT}") {
                             sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' "
                             def route = openshift.selector("route/${APP_NAME}").object()
-                            echo "${route.spec.host}"
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
                         }
                     }
