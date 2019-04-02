@@ -34,7 +34,6 @@ pipeline {
                 sh "npm config set registry http://nexus:8081/repository/npm-group/"
                 sh "npm config set _auth YWRtaW46YWRtaW4xMjM="
                 sh "npm config set email email@email.com"
-                sh "printenv | sort"
             }
         }
         // Checkout source code
@@ -115,16 +114,6 @@ pipeline {
                 verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
-        // stage('Testing Zap') {
-        //     steps {
-        //         script {
-        //             retry(10) {
-        //                 sleep 5
-        //                 sh "curl -s http://${ZAP_APP_NAME}:8080/JSON/core/view/mode"
-        //             }
-        //         }
-        //     }
-        // }
         stage('E2E Testing') {
             steps {
                 //get route from dev namespace
