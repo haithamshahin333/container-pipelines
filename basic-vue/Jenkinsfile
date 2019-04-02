@@ -112,8 +112,6 @@ pipeline {
         }
         stage('Verify Zap Deployment') {
             steps {
-                echo "${ZAP_APP_NAME}"
-                verifyDeployment(targetApp: "zap-15", projectName: "${DEV_PROJECT}")
                 verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
