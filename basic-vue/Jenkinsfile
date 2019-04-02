@@ -31,6 +31,7 @@ pipeline {
     stages {
         stage('Config') {
             steps {
+                verifyDeployment(targetApp: "zap-9", projectName: "labs-hs-dev")
                 sh "npm config set registry http://nexus:8081/repository/npm-group/"
                 sh "npm config set _auth YWRtaW46YWRtaW4xMjM="
                 sh "npm config set email email@email.com"
