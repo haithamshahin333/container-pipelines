@@ -14,6 +14,10 @@ openshift.withCluster() {
     DEV_PROJECT = CI_CD_PROJECT.replace('ci-cd', 'dev')
     TEST_PROJECT = CI_CD_PROJECT.replace('ci-cd', 'test')
 
+    //owasp zap parameters
+    ZAP_TEMPLATE_NAME = "zap"
+    ZAP_APP_NAME = "${ZAP_TEMPLATE_NAME}-${BUILD_ID}"
+
     echo "Starting Pipeline for ${APP_NAME}..."
 
 }
@@ -79,14 +83,34 @@ pipeline {
                 verifyDeployment(targetApp: "${APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
-        stage('Start Owasp Zap') {
-            steps {
-                sh "nohup /usr/share/owasp-zap/zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.regex=true -config api.addrs.addr.name=.* &"
+        // stage('Start Owasp Zap') {
+        //     steps {
+        //         sh "nohup /usr/share/owasp-zap/zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.disablekey=true -config api.addrs.addr.regex=true -config api.addrs.addr.name=.* &"
 
+        //         script {
+        //             retry(10) {
+        //                 sleep 5
+        //                 sh 'curl -s http://localhost:8080/JSON/core/view/mode'
+        //             }
+        //         }
+        //     }
+        // }
+        stage('Start Zap') {
+            steps {
+                openshift.withCluster() {
+                    openshift.withProject("${DEV_PROJECT}") {
+                        def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
+                        openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
+                    }   
+                }
+            }
+        }
+        stage('Testing Zap') {
+            steps {
                 script {
                     retry(10) {
                         sleep 5
-                        sh 'curl -s http://localhost:8080/JSON/core/view/mode'
+                        sh 'curl -s http://${ZAP_APP_NAME}:8080/JSON/core/view/mode'
                     }
                 }
             }
