@@ -2,7 +2,7 @@
 
 library identifier: "pipeline-library@master", retriever: modernSCM(
   [$class: "GitSCMSource",
-   remote: "https://github.com/haithamshahin333/pipeline-library.git"])
+   remote: "https://github.com/redhat-cop/pipeline-library.git"])
 
 openshift.withCluster() {
 
@@ -93,11 +93,13 @@ pipeline {
                         }   
                     }
                 }
+                echo "${ZAP_APP_NAME} deployment has begun"
             }
         }
         stage('Verify Zap Deployment') {
             steps {
                 verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${CI_CD_PROJECT}")
+                echo "${ZAP_APP_NAME} has been deployed and is ready"
             }
         }
         stage('E2E Testing') {
