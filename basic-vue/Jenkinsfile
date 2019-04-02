@@ -16,8 +16,7 @@ openshift.withCluster() {
 
     //owasp zap parameters
     ZAP_TEMPLATE_NAME = "zap"
-    ZAP_APP_NAME = "zap-${BUILD_ID}"
-    env.ZAP_TEST_NAME = "zap-9"
+    env.ZAP_APP_NAME = "zap-${BUILD_ID}"
 
     echo "Starting Pipeline for ${APP_NAME}..."
 
@@ -35,7 +34,6 @@ pipeline {
                 sh "npm config set registry http://nexus:8081/repository/npm-group/"
                 sh "npm config set _auth YWRtaW46YWRtaW4xMjM="
                 sh "npm config set email email@email.com"
-                sh "export ZAP_SERVICE='TESTING'"
                 sh "printenv | sort"
             }
         }
@@ -114,6 +112,8 @@ pipeline {
         }
         stage('Verify Zap Deployment') {
             steps {
+                echo "${ZAP_APP_NAME}"
+                verifyDeployment(targetApp: "zap-15", projectName: "${DEV_PROJECT}")
                 verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${DEV_PROJECT}")
             }
         }
