@@ -114,7 +114,7 @@ pipeline {
                 script {
                     retry(10) {
                         sleep 5
-                        sh 'curl -s http://${ZAP_APP_NAME}:8080/JSON/core/view/mode'
+                        sh "curl -s http://${ZAP_APP_NAME}:8080/JSON/core/view/mode"
                     }
                 }
             }
