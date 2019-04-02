@@ -99,8 +99,7 @@ pipeline {
             steps {
                 script {
                         openshift.withCluster() {
-                            openshift.withProject("${DEV_PROJECT}") {
-                                echo "${DEV_PROJECT}"
+                            openshift.withProject("${CI_CD_PROJECT}") {
                                 def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
                                 openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
                             }   
@@ -111,7 +110,7 @@ pipeline {
         }
         stage('Verify Zap Deployment') {
             steps {
-                verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${DEV_PROJECT}")
+                verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${CI_CD_PROJECT}")
             }
         }
         stage('E2E Testing') {
