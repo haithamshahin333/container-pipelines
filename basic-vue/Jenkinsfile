@@ -97,13 +97,16 @@ pipeline {
         // }
         stage('Start Zap') {
             steps {
-                openshift.withCluster() {
-                    openshift.withProject("${DEV_PROJECT}") {
-                        def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
-                        openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
-                    }   
+                script {
+                        openshift.withCluster() {
+                            openshift.withProject("${DEV_PROJECT}") {
+                                def template = openshift.selector('template', "${ZAP_TEMPLATE_NAME}").object()
+                                openshift.create(openshift.process(template, "-p", "NAME=${ZAP_APP_NAME}"))
+                            }   
+                        }
+                    }
                 }
-            }
+
         }
         stage('Testing Zap') {
             steps {
