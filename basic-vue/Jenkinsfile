@@ -2,7 +2,7 @@
 
 library identifier: "pipeline-library@master", retriever: modernSCM(
   [$class: "GitSCMSource",
-   remote: "https://github.com/haithamshahin333/pipeline-library.git"])
+   remote: "https://github.com/redhat-cop/pipeline-library.git"])
 
 openshift.withCluster() {
 
@@ -106,7 +106,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${DEV_PROJECT}") {
-                            sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' "
+                            sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' tests/e2e/nightwatch.conf.js"
                             def route = openshift.selector("route/${APP_NAME}").object()
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
                         }
@@ -114,19 +114,19 @@ pipeline {
                 }
             }
         }
-        stage('Publish and Shutdown Zap'){
-            steps {
-                sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
-                publishHTML(target: [
-                    reportDir             : 'reports',
-                    reportFiles           : 'zap-passive-report.html',
-                    reportName            : 'ZAProxy Passive Report',
-                    keepAll               : true,
-                    alwaysLinkToLastBuild : true,
-                    allowMissing          : true
-                ])
-            }
-        }
+        // stage('Publish and Shutdown Zap'){
+        //     steps {
+        //         sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
+        //         publishHTML(target: [
+        //             reportDir             : 'reports',
+        //             reportFiles           : 'zap-passive-report.html',
+        //             reportName            : 'ZAProxy Passive Report',
+        //             keepAll               : true,
+        //             alwaysLinkToLastBuild : true,
+        //             allowMissing          : true
+        //         ])
+        //     }
+        // }
         stage('Promotion gate') {
             steps {
                 script {
