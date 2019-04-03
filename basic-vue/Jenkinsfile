@@ -107,7 +107,6 @@ pipeline {
         }
         stage('E2E Testing') {
             steps {
-                //get route from dev namespace
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${DEV_PROJECT}") {
@@ -196,6 +195,5 @@ pipeline {
                 verifyDeployment(targetApp: "${APP_NAME}", projectName: "${TEST_PROJECT}")
             }
         }
-
     }
 }
