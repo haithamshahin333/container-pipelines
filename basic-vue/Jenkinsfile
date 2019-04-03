@@ -94,6 +94,7 @@ pipeline {
                     }
                 }
                 echo "${ZAP_APP_NAME} has been deployed"
+                sh "sleep 10"
             }
         }
         stage('Verify Zap Deployment') {
@@ -112,6 +113,7 @@ pipeline {
                             sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' tests/e2e/nightwatch.conf.js"
                             def route = openshift.selector("route/${APP_NAME}").object()
                             sh "sleep 500"
+                            //check to see when report gets generated
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
                         }
                     }
