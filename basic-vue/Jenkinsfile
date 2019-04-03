@@ -179,7 +179,9 @@ pipeline {
             }
         }
         stage('Bring Down Zap') {
-            sh "oc delete all -l app=${ZAP_APP_NAME}"
+            steps {
+                sh "oc delete all -l app=${ZAP_APP_NAME}"
+            }
         }
         stage('Promotion gate') {
             steps {
