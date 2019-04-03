@@ -93,11 +93,12 @@ pipeline {
                         }   
                     }
                 }
-                echo "${ZAP_APP_NAME} deployment has begun"
+                echo "${ZAP_APP_NAME} has been deployed"
             }
         }
         stage('Verify Zap Deployment') {
             steps {
+                echo "Verifying the zap deployment"
                 verifyDeployment(targetApp: "${ZAP_APP_NAME}", projectName: "${CI_CD_PROJECT}")
                 echo "${ZAP_APP_NAME} has been deployed and is ready"
             }
