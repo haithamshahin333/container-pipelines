@@ -156,7 +156,16 @@ pipeline {
         }
         stage('Publish Active Scan Report') {
             steps {
-                sh "sleep 10"
+                
+                script {
+                    def ascanStatus = 0
+                    while(ascanStatus < 100) {
+                        def jsonReport = sh(returnStdout: true, script: "curl http://${ZAP_APP_NAME}:8080/JSON/ascan/view/status/?scanId=0")
+                        ascanStatus = new JsonSlurper().parseText(jsonReport).status.toInteger()
+                        echo "${ascanStatus}"
+                    }
+                }
+
                 sh "curl http://${ZAP_APP_NAME}:8080/OTHER/core/other/htmlreport -o reports/zap-active-report.html"
 
                 publishHTML(target: [
