@@ -119,7 +119,7 @@ pipeline {
                 }
             }
         }
-        stage('Wait for Passive Scan to Complete') {
+        stage('Wait for Passive Scan to Complete and Publish Results') {
             steps {
                 script {
                     def pscanStatus = 1
@@ -136,6 +136,33 @@ pipeline {
                     reportDir             : 'reports',
                     reportFiles           : 'zap-passive-report.html',
                     reportName            : 'ZAProxy Passive Report',
+                    keepAll               : true,
+                    alwaysLinkToLastBuild : true,
+                    allowMissing          : true
+                ])
+            }
+        }
+        stage('Start Active Scan') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject("${DEV_PROJECT}") {
+                            def route = openshift.selector("route/${APP_NAME}").object()
+                            sh "curl http://${ZAP_APP_NAME}:8080/JSON/ascan/action/scan/?url=https://${route.spec.host}"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Publish Active Scan Report') {
+            steps {
+                sh "sleep 10"
+                sh "curl http://${ZAP_APP_NAME}:8080/OTHER/core/other/htmlreport -o reports/zap-active-report.html"
+
+                publishHTML(target: [
+                    reportDir             : 'reports',
+                    reportFiles           : 'zap-active-report.html',
+                    reportName            : 'ZAProxy Active Report',
                     keepAll               : true,
                     alwaysLinkToLastBuild : true,
                     allowMissing          : true
