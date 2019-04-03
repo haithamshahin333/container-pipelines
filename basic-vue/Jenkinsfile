@@ -124,9 +124,9 @@ pipeline {
                 script {
                     def pscanStatus = 1
                     while(pscanStatus > 0) {
-                        sh "sleep 5"
                         def jsonReport = sh(returnStdout: true, script: "curl http://${ZAP_APP_NAME}:8080/JSON/pscan/view/recordsToScan")
                         pscanStatus = new JsonSlurper().parseText(jsonReport).recordsToScan.toInteger()
+                        echo pscanStatus
                     }
                 }
 
