@@ -112,27 +112,35 @@ pipeline {
                         openshift.withProject("${DEV_PROJECT}") {
                             sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' tests/e2e/nightwatch.conf.js"
                             def route = openshift.selector("route/${APP_NAME}").object()
-                            sh "sleep 500"
-                            //check to see when report gets generated
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
                         }
                     }
                 }
             }
         }
-        // stage('Publish and Shutdown Zap'){
-        //     steps {
-        //         sh "curl http://localhost:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
-        //         publishHTML(target: [
-        //             reportDir             : 'reports',
-        //             reportFiles           : 'zap-passive-report.html',
-        //             reportName            : 'ZAProxy Passive Report',
-        //             keepAll               : true,
-        //             alwaysLinkToLastBuild : true,
-        //             allowMissing          : true
-        //         ])
-        //     }
-        // }
+        stage('Wait for Passive Scan to Complete') {
+            steps {
+                script {
+                    def pscanStatus = 1
+                    while(pscanStatus > 0) {
+                        sh "sleep 5"
+                        def jsonReport = sh(returnStdout: true, script: "curl http://${ZAP_APP_NAME}:8080/JSON/pscan/view/recordsToScan")
+                        pscanStatus = new JsonSlurper().parseText(jsonReport).recordsToScan.toInteger()
+                    }
+                }
+
+                sh "curl http://${ZAP_APP_NAME}:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
+                
+                publishHTML(target: [
+                    reportDir             : 'reports',
+                    reportFiles           : 'zap-passive-report.html',
+                    reportName            : 'ZAProxy Passive Report',
+                    keepAll               : true,
+                    alwaysLinkToLastBuild : true,
+                    allowMissing          : true
+                ])
+            }
+        }
         stage('Promotion gate') {
             steps {
                 script {
