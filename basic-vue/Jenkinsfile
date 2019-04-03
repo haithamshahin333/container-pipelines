@@ -156,7 +156,7 @@ pipeline {
         }
         stage('Publish Active Scan Report') {
             steps {
-                
+
                 script {
                     def ascanStatus = 0
                     while(ascanStatus < 100) {
@@ -177,6 +177,9 @@ pipeline {
                     allowMissing          : true
                 ])
             }
+        }
+        stage('Bring Down Zap') {
+            sh "oc delete all -l app=${ZAP_APP_NAME}"
         }
         stage('Promotion gate') {
             steps {
