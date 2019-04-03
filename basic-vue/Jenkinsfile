@@ -1,4 +1,5 @@
 
+import groovy.json.JsonSlurper
 
 library identifier: "pipeline-library@master", retriever: modernSCM(
   [$class: "GitSCMSource",
@@ -130,7 +131,7 @@ pipeline {
                 }
 
                 sh "curl http://${ZAP_APP_NAME}:8080/OTHER/core/other/htmlreport -o reports/zap-passive-report.html"
-                
+
                 publishHTML(target: [
                     reportDir             : 'reports',
                     reportFiles           : 'zap-passive-report.html',
