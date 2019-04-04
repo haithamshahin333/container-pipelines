@@ -110,7 +110,10 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject("${DEV_PROJECT}") {
+                            //proxy through the zap service that has been deployed
                             sh "sed -i 's/ZAP_SERVICE_TO_BE_SUBSTITUTED/${ZAP_APP_NAME}/' tests/e2e/nightwatch.conf.js"
+
+                            //dynamically grab route to run e2e tests against
                             def route = openshift.selector("route/${APP_NAME}").object()
                             sh "npm run test:e2e -- --url 'https://${route.spec.host}' --config tests/e2e/nightwatch.conf.js"
                         }
@@ -139,6 +142,20 @@ pipeline {
                     alwaysLinkToLastBuild : true,
                     allowMissing          : true
                 ])
+
+                script {
+                    // fail build if report shows high/critical risks
+                    def jsonReport = sh(returnStdout: true, script: "curl http://${ZAP_APP_NAME}:8080/OTHER/core/other/jsonreport")
+                    def jsonData = new JsonSlurper().parseText(jsonReport)
+                    def highCriticalRisks = jsonData.site.each { site ->
+                        site.alerts.each { alert ->
+                            def alertValue = alert.riskcode as Integer
+                            if (alertValue >= 3) {
+                                error 'High/Critical Risks Detected By Zed Attack Proxy'
+                            }
+                        }
+                    }
+                }
             }
         }
         stage('Start Active Scan') {
