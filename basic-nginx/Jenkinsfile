@@ -50,6 +50,19 @@ pipeline {
       }
     }
 
+    stage('Send Data to Pelorus') {
+      steps {
+        script {
+          openshift.withCluster() {
+            openshift.withProject("${env.BUILD}") {
+              def image = openshift.selector("imagestream/${env.APP_NAME}").object()
+              echo "${image}"
+            }
+          }
+        }
+      }
+    }
+
     stage('Promote from Build to Dev') {
       steps {
         tagImage(sourceImageName: env.APP_NAME, sourceImagePath: env.BUILD, toImagePath: env.DEV)
