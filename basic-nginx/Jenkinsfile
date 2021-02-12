@@ -57,8 +57,13 @@ pipeline {
             openshift.withProject("${env.BUILD}") {
               def image = openshift.selector("imagestream/${env.APP_NAME}").object()
               echo "${image.status.tags[0].items[0].image}"
+              env.IMAGE_SHA = image.status.tags[0].items[0].image
             }
           }
+        }
+        script {
+          echo "printing image sha"
+          echo "${env.IMAGE_SHA}"
         }
       }
     }
