@@ -72,7 +72,7 @@ pipeline {
           echo "printing image sha"
           echo "${env.IMAGE_SHA}"
         }
-        sh '''
+        sh """
         echo "running curl command"
         curl --request POST 'http://${env.IMPORTER_ROUTE}/post/build' \
         --header 'Content-Type: application/json' \
@@ -82,7 +82,7 @@ pipeline {
         "git_provider": "github", 
         "repo":${SOURCE_REPOSITORY_URL}, 
         "branch":${SOURCE_REPOSITORY_REF}}'
-        '''
+        """
       }
     }
 
