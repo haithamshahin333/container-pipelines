@@ -76,12 +76,12 @@ pipeline {
         echo "running curl command"
         curl --request POST 'http://${env.IMPORTER_ROUTE}/post/build' \
         --header 'Content-Type: application/json' \
-        --data-raw '{"app": ${env.APP_NAME}, 
-        "commit":${env.GIT_COMMIT}, 
-        "image_sha":${env.IMAGE_SHA}, 
+        --data-raw '{"app": "${env.APP_NAME}", 
+        "commit":"${env.GIT_COMMIT}", 
+        "image_sha":"${env.IMAGE_SHA}", 
         "git_provider": "github", 
-        "repo":${SOURCE_REPOSITORY_URL}, 
-        "branch":${SOURCE_REPOSITORY_REF}}'
+        "repo":"${SOURCE_REPOSITORY_URL}", 
+        "branch":"${SOURCE_REPOSITORY_REF}"}'
         """
       }
     }
