@@ -27,6 +27,7 @@ pipeline {
     stage('Git Checkout') {
       steps {
         git url: "${SOURCE_REPOSITORY_URL}", branch: "${SOURCE_REPOSITORY_REF}"
+        sh "echo ${GIT_COMMIT}"
       }
     }
 
