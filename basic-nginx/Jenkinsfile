@@ -56,7 +56,7 @@ pipeline {
           openshift.withCluster() {
             openshift.withProject("${env.BUILD}") {
               def image = openshift.selector("imagestream/${env.APP_NAME}").object()
-              echo "${image}"
+              echo "${image.status.tags}"
             }
           }
         }
