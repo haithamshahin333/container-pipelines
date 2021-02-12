@@ -14,6 +14,8 @@ openshift.withCluster() {
   env.DEV = "${APP_NAME}-dev"
   env.STAGE = "${APP_NAME}-stage"
   env.PROD = "${APP_NAME}-prod"
+  env.PELORUS = "pelorus"
+  env.IMPORTER_APP_NAME = "importer"
   echo "Starting Pipeline for ${APP_NAME}..."
 }
 
@@ -59,12 +61,28 @@ pipeline {
               echo "${image.status.tags[0].items[0].image}"
               env.IMAGE_SHA = image.status.tags[0].items[0].image
             }
+            openshift.withProject("${env.PELORUS}") {
+              def route = openshift.selector("route/${env.IMPORTER_APP_NAME}").object()
+              echo "${route.spec.host}"
+              env.IMPORTER_ROUTE = route.spec.host
+            }
           }
         }
         script {
           echo "printing image sha"
           echo "${env.IMAGE_SHA}"
         }
+        sh '''
+        echo "running curl command"
+        curl --request POST 'http://${env.IMPORTER_ROUTE}/post/build' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{"app": ${env.APP_NAME}, 
+        "commit":${env.GIT_COMMIT}, 
+        "image_sha":${env.IMAGE_SHA}, 
+        "git_provider": "github", 
+        "repo":${SOURCE_REPOSITORY_URL}, 
+        "branch":${SOURCE_REPOSITORY_REF}}'
+        '''
       }
     }
 
