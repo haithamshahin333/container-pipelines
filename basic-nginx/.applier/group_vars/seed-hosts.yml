@@ -22,6 +22,9 @@ openshift_cluster_content:
   - name: basic-nginx-prod
     template: "{{ inventory_dir }}/../.openshift/deployment/template.yml"
     params: "{{ inventory_dir }}/../.openshift/deployment/prod/params"
+  - name: pelorus-rolebinding
+    template: "{{ inventory_dir }}/../.openshift/rolebinding/template.yml"
+    params: "{{ inventory_dir }}/../.openshift/rolebinding/pelorus/params"
 - object: builds
   content:
   - name: jenkins
